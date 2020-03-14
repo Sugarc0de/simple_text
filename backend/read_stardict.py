@@ -5,12 +5,12 @@ Created on Thu Apr 06 00:02:42 2017
 @author: Chung Ning
 """
 import json
-
-# BELOW CODE ONLY RUN ONCE TO CREATE DICTIONARY FOR SAVE
+#
+# # BELOW CODE ONLY RUN ONCE TO CREATE DICTIONARY FOR SAVE
 # import struct
 #
-# idx_file = open('stardict-oxford-gb-2.4.2/oxford-gb.idx', 'rb')
-# dict_file = open('stardict-oxford-gb-2.4.2/dict', 'rb')
+# idx_file = open('stardict-lazyworm-ec-2.4.2/lazyworm-ec.idx', 'rb')
+# dict_file = open('stardict-lazyworm-ec-2.4.2/lazyworm-ec', 'rb')
 #
 # dict_idx = dict()
 #
@@ -36,7 +36,7 @@ import json
 #     # print(word_data_size)
 #
 # dict_idx = json.dumps(dict_idx)
-# f = open("stardict-oxford-gb-2.4.2/dict_idx.json", "w")
+# f = open("stardict-lazyworm-ec-2.4.2/lazy_dict_idx.json", "w")
 # f.write(dict_idx)
 # f.close()
 # idx_file.close()
@@ -44,11 +44,11 @@ import json
 
 class Dictionary:
     def __init__(self):
-        with open('stardict-oxford-gb-2.4.2/dict_idx.json') as f:
+        with open('stardict-lazyworm-ec-2.4.2/lazy_dict_idx.json') as f:
             self.dict_idx = json.load(f)
 
     def lookup(self, word):
-        dict_file = open('stardict-oxford-gb-2.4.2/dict', 'rb')
+        dict_file = open('stardict-lazyworm-ec-2.4.2/lazyworm-ec', 'rb')
         word_data_offset, word_data_size = self.dict_idx.get(word, (-1, -1))
         if word_data_offset == -1 and word_data_size == -1:
             return ""
@@ -56,5 +56,6 @@ class Dictionary:
         word_dict = dict_file.read(word_data_size)
         dict_file.close()
         return(word_dict.decode('utf-8'))
+
 
 
