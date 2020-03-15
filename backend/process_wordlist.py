@@ -45,8 +45,6 @@ class Wordlist:
             with open('dict.pickle', 'rb') as handle:
                 self.dic = pickle.load(handle)
             print('Finished loading the dictionary.')
-        for level in self.dic:
-            print("the mean log word frequency is {} out of len {}".format(self.dic[level][1], len(self.dic[level][0])))
         return
 
     def isLevel(self, word, level):

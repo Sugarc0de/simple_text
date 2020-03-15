@@ -4,9 +4,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import WordNetLemmatizer
 import nltk
 from nltk.corpus import wordnet
-from wordfreq import word_frequency
 from collections import defaultdict
-from string import ascii_lowercase
 import read_stardict
 import process_wordlist
 
@@ -36,35 +34,6 @@ def lemmatize(text):
             new_text.append(lemma_word.lower())
     return [t for s in old_text for t in s], new_text
 
-# shorten the oxford definition of a word
-# only show the first group of chinese
-# input: a string of the definition
-def shorted_text(text):
-    print(text)
-    ans = ""
-    prev_idx = -1
-    open_bracket = 0
-    for idx, c in enumerate(text):
-        # chinese characters
-        if c == '{' or c == '[' or c == '(':
-            open_bracket += 1
-            continue
-        if c == '}' or c == ']' or c == ')':
-            open_bracket -= 1
-            continue
-        if c > u'\u4e00' and c < u'\u9fff' and open_bracket == 0:
-            if prev_idx != -1:
-                ans = ans + ' ； '
-                prev_idx = -1
-            ans = ans + c
-            continue
-        if c in [',', '.', ';', ':', ' '] and len(ans) != 0:
-            prev_idx = idx
-            continue
-        if c.lower() in ascii_lowercase and len(ans) != 0:
-            break
-    return ans
-
 # find the most frequent lemmatized words
 def findfreq(level, new_text):
     dict = defaultdict()
@@ -89,7 +58,7 @@ def findfreq(level, new_text):
     while i < len(item_levels):
         chinese_text = dic.lookup(item_levels[i][0])
         if chinese_text!='':
-            shorted = shorted_text(chinese_text)
+            shorted = chinese_text.replace('\n', ' ')
             if shorted == '':
                 level_dict.append((item_levels[i][0], item_levels[i][1], chinese_text))
             else:
