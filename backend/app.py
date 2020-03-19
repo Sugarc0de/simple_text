@@ -7,6 +7,7 @@ from nltk.corpus import wordnet
 from collections import defaultdict
 import read_stardict
 import process_wordlist
+from decorators import limit_content_length
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -49,7 +50,7 @@ def findfreq(level, new_text):
             dict[word] = word_level
         elif word_level == 'NA':
             estimated_level = wl.estimate(word)
-            # print('estimated level for {} is {}'.format(word, estimated_level))
+            print('estimated level for {} is {}'.format(word, estimated_level))
             if estimated_level in level_range:
                 dict[word] = estimated_level
     item_levels = list(dict.items()) # default is to include everything
@@ -77,6 +78,7 @@ def findOldtext(old_text, new_text, item_levels):
     return old_words
 
 @app.route('/findwords', methods=['POST'])
+@limit_content_length(30000)
 def findwords():
     if request.method == 'POST':
         data = request.get_json(force=True)
@@ -103,3 +105,7 @@ if __name__ == '__main__':
     dic = read_stardict.Dictionary()
     wl = process_wordlist.Wordlist()
     app.run(debug=True)
+    # from gevent.pywsgi import WSGIServer
+    # app.debug = False
+    # http_server = WSGIServer(('', 8000), app)
+    # http_server.serve_forever()
