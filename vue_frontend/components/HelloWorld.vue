@@ -6,6 +6,10 @@
     <br/>
     <el-form ref="form" :model="form" :rules="rules">
       <el-form-item>
+        <p>Copy and paste your own English text and the program will highlight difficult vocabulary based on your English level </p>
+        <p align="left">复制粘贴任意英文文章，即可一键生成所有生词</p>
+      </el-form-item>
+      <el-form-item>
         <el-input type="textarea" v-model="form.desc" placeholder="Copy-paste your own text(s)..."></el-input>
       </el-form-item>
       <el-form-item prop="value">
@@ -29,6 +33,10 @@
   <div v-else>
     <h1 class="title" style="color:white;">Simple Text</h1>
     <br/>
+    <br/>
+    <p align="left">Click the highlighted text to view its definition</p>
+    <br/>
+    <p align="left">点击重点词汇上即可查看注释</p>
     <br/>
     <div>
       <DisplayText
