@@ -102,7 +102,7 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
-              const response = await axios.post(`http://127.0.0.1:5000/findwords`, {
+              const response = await axios.post(`/app/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
               this.output = this.form.desc.replace(/\n/g, '<br>');
