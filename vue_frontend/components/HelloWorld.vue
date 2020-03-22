@@ -5,9 +5,10 @@
     <br/>
     <br/>
     <el-form ref="form" :model="form" :rules="rules">
-      <el-form-item>
+      <el-form-item align="left">
         <p>Copy and paste your own English text and the program will highlight difficult vocabulary based on your English level </p>
-        <p align="left">复制粘贴任意英文文章，即可一键生成所有生词</p>
+        <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
+        <AutoImport @getData="getSample"/>
       </el-form-item>
       <el-form-item>
         <el-input type="textarea" v-model="form.desc" placeholder="Copy-paste your own text(s)..."></el-input>
@@ -36,7 +37,7 @@
     <br/>
     <p align="left">Click the highlighted text to view its definition</p>
     <br/>
-    <p align="left">点击重点词汇上即可查看注释</p>
+    <p align="left">点击重点词汇即可查看注释</p>
     <br/>
     <div>
       <DisplayText
@@ -65,9 +66,10 @@
 <script>
   import axios from 'axios';
   import DisplayText from "./DisplayText";
+  import AutoImport from "./AutoImport"
 
   export default {
-    components: {DisplayText},
+    components: {DisplayText, AutoImport},
     data() {
       return {
         form: {
@@ -81,11 +83,11 @@
         },
         hide_input: true,
         errors: [],
-        legacyHTML: '',
         activeNames: ['1'],
         wordMeaning: {},
         output: '',
-        jsonResults: {}
+        jsonResults: {},
+        dialogTableVisible: false
       }
     },
     methods: {
@@ -117,6 +119,10 @@
             return false
           }
         })
+      },
+      getSample(value) {
+        this.form.desc = value['text'];
+        this.form.value = `${value['level']}2`
       }
     }
   }

@@ -8,6 +8,7 @@ import Card from 'element-ui/lib/card'
 import Select from 'element-ui/lib/select'
 import Option from 'element-ui/lib/option'
 import PopOver from 'element-ui/lib/popover'
+import Cascader from 'element-ui/lib/cascader'
 
 // import locale from 'element-ui/lib/locale/lang/en'
 
@@ -19,4 +20,5 @@ Vue.use(Card)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(PopOver)
+Vue.use(Cascader)
 

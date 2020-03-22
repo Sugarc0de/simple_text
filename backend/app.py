@@ -1,13 +1,16 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_cors import CORS
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.stem import WordNetLemmatizer
-import nltk
-from nltk.corpus import wordnet
+# from nltk.tokenize import sent_tokenize, word_tokenize
+# from nltk.stem import WordNetLemmatizer
+# import nltk
+# from nltk.corpus import wordnet
+import spacy
 from collections import defaultdict
 import read_stardict
 import process_wordlist
 from decorators import limit_content_length
+import json
+import os
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -25,15 +28,28 @@ def get_wordnet_pos(word):
     return tag_dict.get(tag, wordnet.NOUN)
 
 # This function takes in a string and lemmatizes every word
-def lemmatize(text):
+def lemmatize_nltk(text):
     lemmatizer = WordNetLemmatizer()
     new_text = []
     old_text = [word_tokenize(t) for t in sent_tokenize(text)]
     for sentence in old_text:
         for word in sentence:
-            lemma_word = lemmatizer.lemmatize(word, get_wordnet_pos(word))
+            # if dic.lookup(word) != '':
+            #     print("dictionary has word {}".format(word))
+            #     new_text.append(word.lower())
+            #     continue
+            pos = get_wordnet_pos(word)
+            lemma_word = lemmatizer.lemmatize(word, pos)
+            print("lemmatized form of the word {} with pos {} is {}".format(word, pos, lemma_word))
             new_text.append(lemma_word.lower())
     return [t for s in old_text for t in s], new_text
+
+# spacy model for lemmatization (better)
+def lemmatize(text):
+    document = sp(text)
+    old_text = [t.text for t in document]
+    new_text = [t.lemma_ for t in document]
+    return old_text, new_text
 
 # find the most frequent lemmatized words
 def findfreq(level, new_text):
@@ -89,13 +105,17 @@ def findwords():
         old_words = findOldtext(old_text, new_text, item_levels)
         return {'level': level, 'new_text': item_levels, 'old_words': old_words}
 
-# @app.route('/test', methods=['POST'])
-# def test():
-#     if request.method == 'POST':
-#         data = request.get_json(force=True)
-#         text = data['text']
-#         _, new_text = lemmatize(text)
-#         return {'new_text': wl.checkParagraph(new_text)}
+@app.route('/samples', methods=['GET'])
+def test():
+    if request.method == 'GET':
+        genre = request.args['genre']
+        level = request.args['level']
+        if os.path.exists('sample_text/{}_{}.json'.format(genre, level)):
+            with open('sample_text/{}_{}.json'.format(genre, level), 'r') as f:
+                data = f.read()
+            obj = json.loads(data)
+            return {'text': obj['text']}
+    abort(500)
 
 @app.route('/')
 def hello():
@@ -104,8 +124,9 @@ def hello():
 if __name__ == '__main__':
     dic = read_stardict.Dictionary()
     wl = process_wordlist.Wordlist()
-    app.run(debug=True)
-    # from gevent.pywsgi import WSGIServer
-    # app.debug = False
-    # http_server = WSGIServer(('', 8000), app)
-    # http_server.serve_forever()
+    sp = spacy.load('en_core_web_sm')
+    # app.run(debug=True)
+    from gevent.pywsgi import WSGIServer
+    app.debug = False
+    http_server = WSGIServer(('', 8000), app)
+    http_server.serve_forever()
