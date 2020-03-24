@@ -6,20 +6,31 @@ import pickle
 import math
 import os
 import re
+import numpy as np
+
+# distinct_dict.pickle contains 8229 unique English words, A1-B2 from Japanese CERR
+# while the rest 2 from https://www.toe.gr/course/view.php?id=27
+
+# english_profile_wordlist has total six levels from https://www.toe.gr/course/view.php?id=27
 
 class Wordlist:
-    def __init__(self, filename='CEFR-J_Wordlist_Ver1.5.xls'):
-        if not os.path.exists('dict.pickle'):
-            CEFR = ['A1', 'A2', 'B1', 'B2']
+    def __init__(self, curr_dir=""):
+        dict_file = 'english_profile_wordlist.pickle'
+        self.loaded_model = pickle.load(open('baseline_model.sav', 'rb'))
+        if not os.path.exists(curr_dir+dict_file):
+            self.S = set()
             self.dic = defaultdict()
-            xls = pd.ExcelFile(filename)
-            for level in CEFR:
-                df = pd.read_excel(xls, level)
-                df['headword'] = df['headword'].str.split('/')
-                self.dic[level] = [[], [], []]
-                self.dic[level][0] = list(chain(*df['headword'].values.tolist()))
-                self.dic[level][1] = math.log(sum([word_frequency(w, 'en') for w in self.dic[level][0]])/len(self.dic[level][0]))
-            wordlists = ['C1', 'C2']
+            # CEFR = ['A1', 'A2', 'B1', 'B2']
+            # xls = pd.ExcelFile(filename)
+            # for level in CEFR:
+            #     df = pd.read_excel(xls, level)
+            #     df['headword'] = df['headword'].str.split('/')
+            #     self.dic[level] = [[], [], []]
+            #     self.dic[level][0] = list(set([w for w in list(chain(*df['headword'].values.tolist()))
+            #                           if w not in self.S]))
+            #     self.S.update(self.dic[level][0])
+            #     self.dic[level][1] = math.log(sum([word_frequency(w, 'en') for w in self.dic[level][0]])/len(self.dic[level][0]))
+            wordlists = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
             regex = re.compile(".* /.*/")
             for level in wordlists:
                 self.dic[level] = [[], [], []]
@@ -28,29 +39,20 @@ class Wordlist:
                         result = regex.search(line)
                         if result is not None:
                             parts = result.group(0).split(' ')
-                            polysemy = False
-                            for pre_level in CEFR:
-                                if self.isLevel(parts[0], pre_level):
-                                    polysemy = True
-                                    break
-                            if not polysemy:
+                            if parts[0] not in self.S:
                                 self.dic[level][0].append(parts[0])
                                 self.dic[level][1].append(word_frequency(parts[0], 'en'))
                                 self.dic[level][2].append(parts[1])
+                                self.S.add(parts[0])
                 self.dic[level][1] = math.log(sum(self.dic[level][1])/len(self.dic[level][1]))
-            with open('dict.pickle', 'wb') as handle:
+            with open(curr_dir+dict_file, 'wb') as handle:
                 pickle.dump(self.dic, handle)
             print('Finished creating the dictionary.')
         else:
-            with open('dict.pickle', 'rb') as handle:
+            with open(curr_dir+dict_file, 'rb') as handle:
                 self.dic = pickle.load(handle)
             print('Finished loading the dictionary.')
         return
-
-    def isLevel(self, word, level):
-        if word in self.dic[level][0]:
-            return True
-        return False
 
     def checkLevel(self, word):
         for level in self.dic:
@@ -67,15 +69,12 @@ class Wordlist:
                 stack.append((word, level))
         return stack
 
-    # estimate CEFR level of a word based on the hard threshold of word frequency
+    # estimate CEFR level of a word from imported baseline model
     def estimate(self, word):
         freq = word_frequency(word, 'en')
         if freq == 0:
-            return 'Not a word'
-        freq = math.log(freq)
-        diff = []
-        for level in self.dic:
-            diff.append(abs(freq-self.dic[level][1]))
-        return list(self.dic.keys())[diff.index(min(diff))]
-
+            return 'Non-Word'
+        freq = math.log(freq+1e-7)
+        # Todo: rewrite it into bath predict
+        return self.loaded_model.predict[np.array(freq)]
 
