@@ -7,69 +7,56 @@ from flask_cors import CORS
 import spacy
 from collections import defaultdict
 import read_stardict
-import process_wordlist
 from decorators import limit_content_length
+import baseline_model
+import process_wordlist
+import numpy as np
+import pandas as pd
 import json
 import os
+import string
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
-
-# This function is taken from https://www.machinelearningplus.com/nlp/
-# lemmatization-examples-python/#comparingnltktextblobspacypatternandstanfordcorenlp
-def get_wordnet_pos(word):
-    """Map POS tag to first character lemmatize() accepts"""
-    tag = nltk.pos_tag([word])[0][1][0].upper()
-    tag_dict = {"J": wordnet.ADJ,
-                "N": wordnet.NOUN,
-                "V": wordnet.VERB,
-                "R": wordnet.ADV}
-
-    return tag_dict.get(tag, wordnet.NOUN)
-
-# This function takes in a string and lemmatizes every word
-def lemmatize_nltk(text):
-    lemmatizer = WordNetLemmatizer()
-    new_text = []
-    old_text = [word_tokenize(t) for t in sent_tokenize(text)]
-    for sentence in old_text:
-        for word in sentence:
-            # if dic.lookup(word) != '':
-            #     print("dictionary has word {}".format(word))
-            #     new_text.append(word.lower())
-            #     continue
-            pos = get_wordnet_pos(word)
-            lemma_word = lemmatizer.lemmatize(word, pos)
-            print("lemmatized form of the word {} with pos {} is {}".format(word, pos, lemma_word))
-            new_text.append(lemma_word.lower())
-    return [t for s in old_text for t in s], new_text
 
 # spacy model for lemmatization (better)
 def lemmatize(text):
     document = sp(text)
     old_text = [t.text for t in document]
-    new_text = [t.lemma_ for t in document]
+    new_text = [t.lemma_ if t.lemma_ != '-PRON-' else t.text for t in document]
     return old_text, new_text
 
 # find the most frequent lemmatized words
 def findfreq(level, new_text):
     dict = defaultdict()
+    predict_waitlist = []
+    level_idx = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].index(level)
+    level_range = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'][level_idx:]
+    wordlist_words = []
+    wordlist_level = []
+    puncs = set(string.punctuation)
     for word in new_text:
         if word in dict:
             continue
+        if all(j.isdigit() or j in puncs for j in word) and any(j.isdigit() for j in word):
+            continue
         # word_level can be 'NA' if this word not in all my word lists
         word_level = wl.checkLevel(word)
-        level_idx = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].index(level)
-        level_range = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'][level_idx:]
         # print('level range is: {}'.format(level_range))
         if word_level in level_range:
-            dict[word] = word_level
+            wordlist_words.append(word)
+            wordlist_level.append(word_level)
         elif word_level == 'NA':
-            estimated_level = wl.estimate(word)
-            print('estimated level for {} is {}'.format(word, estimated_level))
-            if estimated_level in level_range:
-                dict[word] = estimated_level
-    item_levels = list(dict.items()) # default is to include everything
+            predict_waitlist.append(word)
+    y_true = pd.concat([pd.DataFrame(np.array(wordlist_words), columns=['x']),
+                        pd.DataFrame(wordlist_level, columns=['level'])], axis=1)
+    # send the rest 'NA' words to prediction
+    y_pred = model.predict(predict_waitlist, level_range)
+    print("predict {} number of new words".format(y_pred.shape))
+    print(y_pred)
+    y_merged = pd.concat([y_true, y_pred], axis=0)
+    y_merged = y_merged.drop_duplicates(subset=["x"], keep='first')
+    item_levels = y_merged.values.tolist() # default is to include everything
     level_dict = []
     i = 0
     while i < len(item_levels):
@@ -124,6 +111,7 @@ def hello():
 if __name__ == '__main__':
     dic = read_stardict.Dictionary()
     wl = process_wordlist.Wordlist()
+    model = baseline_model.FreqModel()
     sp = spacy.load('en_core_web_sm')
     # app.run(debug=True)
     from gevent.pywsgi import WSGIServer

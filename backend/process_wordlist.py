@@ -70,11 +70,11 @@ class Wordlist:
         return stack
 
     # estimate CEFR level of a word from imported baseline model
-    def estimate(self, word):
-        freq = word_frequency(word, 'en')
-        if freq == 0:
-            return 'Non-Word'
-        freq = math.log(freq+1e-7)
-        # Todo: rewrite it into bath predict
-        return self.loaded_model.predict[np.array(freq)]
+    # def estimate(self, word):
+    #     freq = word_frequency(word, 'en')
+    #     if freq == 0:
+    #         return 'Non-Word'
+    #     freq = math.log(freq+1e-7)
+    #     # Todo: rewrite it into batch predict (Updated: move this to app.py)
+    #     return self.loaded_model.predict[np.array(freq)]
 
