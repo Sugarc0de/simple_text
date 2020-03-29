@@ -8,6 +8,7 @@ import spacy
 from collections import defaultdict
 import read_stardict
 from decorators import limit_content_length
+import aws_controller
 import baseline_model
 import process_wordlist
 import numpy as np
@@ -30,8 +31,8 @@ def lemmatize(text):
 def findfreq(level, new_text):
     dict = defaultdict()
     predict_waitlist = []
-    level_idx = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].index(level)
-    level_range = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'][level_idx:]
+    level_idx = CEFR.index(level)
+    level_range = CEFR[level_idx:]
     wordlist_words = []
     wordlist_level = []
     puncs = set(string.punctuation)
@@ -51,10 +52,13 @@ def findfreq(level, new_text):
     y_true = pd.concat([pd.DataFrame(np.array(wordlist_words), columns=['x']),
                         pd.DataFrame(wordlist_level, columns=['level'])], axis=1)
     # send the rest 'NA' words to prediction
-    y_pred = model.predict(predict_waitlist, level_range)
-    print("predict {} number of new words".format(y_pred.shape))
-    print(y_pred)
-    y_merged = pd.concat([y_true, y_pred], axis=0)
+    if len(predict_waitlist) >= 1:
+        y_pred = model.predict(predict_waitlist, level_range)
+        print("predict {} number of new words".format(y_pred.shape))
+        print(y_pred)
+        y_merged = pd.concat([y_true, y_pred], axis=0)
+    else:
+        y_merged = y_true
     y_merged = y_merged.drop_duplicates(subset=["x"], keep='first')
     item_levels = y_merged.values.tolist() # default is to include everything
     level_dict = []
@@ -87,6 +91,10 @@ def findwords():
         data = request.get_json(force=True)
         text = data['text']
         level = data['level']
+        if text == '' or level not in CEFR:
+            abort(400)
+        ip = request.remote_addr
+        aws_controller.put_item(ip, level, text)
         old_text, new_text = lemmatize(text)
         item_levels = findfreq(level, new_text)
         old_words = findOldtext(old_text, new_text, item_levels)
@@ -102,7 +110,7 @@ def test():
                 data = f.read()
             obj = json.loads(data)
             return {'text': obj['text']}
-    abort(500)
+    abort(400)
 
 @app.route('/')
 def hello():
@@ -113,8 +121,9 @@ if __name__ == '__main__':
     wl = process_wordlist.Wordlist()
     model = baseline_model.FreqModel()
     sp = spacy.load('en_core_web_sm')
-    # app.run(debug=True)
-    from gevent.pywsgi import WSGIServer
-    app.debug = False
-    http_server = WSGIServer(('', 8000), app)
-    http_server.serve_forever()
+    CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+    app.run(debug=True)
+    # from gevent.pywsgi import WSGIServer
+    # app.debug = False
+    # http_server = WSGIServer(('', 8000), app)
+    # http_server.serve_forever()
