@@ -60,8 +60,6 @@
 <style scoped>
   .result {
     padding: 5px;
-    left: 300px;
     border: 1px dashed purple;
-    width: 800px;
   }
 </style>

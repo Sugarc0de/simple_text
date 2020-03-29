@@ -16,12 +16,13 @@ export default {
 
 <style>
 .container {
-  margin: 0 auto;
+  margin: 3%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+  position: relative;
 }
 body {
   background-image: url(../static/background.jpeg) ;

@@ -6,7 +6,8 @@
     <br/>
     <el-form ref="form" :model="form" :rules="rules">
       <el-form-item align="left">
-        <p>Copy and paste your own English text and the program will highlight difficult vocabulary based on your English level </p>
+        <p>Copy and paste your own English text and the program will highlight difficult vocabulary based on your
+          English level </p>
         <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
         <AutoImport @getData="getSample"/>
       </el-form-item>
@@ -26,40 +27,37 @@
       <el-form-item>
         <el-button type="primary" @click="onSubmit('form')">Find Words</el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button class="btn-reset" @click="reset()">Reset Text</el-button>
-      </el-form-item>
     </el-form>
   </div>
-  <div v-else>
+  <div position="absolute" v-else>
     <h1 class="title" style="color:white;">Simple Text</h1>
     <br/>
-    <br/>
-    <p align="left">Click the highlighted text to view its definition</p>
-    <br/>
-    <p align="left">点击重点词汇即可查看注释</p>
-    <br/>
-    <div>
-      <DisplayText
-        :jsonResults="jsonResults"
-        :output="output"
-      />
-    </div>
-    <br/><br/>
-    <div>
-      <el-card class="box-card">
-        <div slot="header" class="clearfix" align="left">
-          <span>Words that you may not know:</span>
-        </div>
-        <div v-for="(wm, index) in wordMeaning" :key="`wm-${index}`" class="text item">
-          {{wm[0]}}&nbsp;{{wm[2]}}
-        </div>
-      </el-card>
+    <el-form>
+      <el-form-item align="left">
+        <el-button type="primary" @click="reset()">Back</el-button>
+      </el-form-item>
+      <el-form-item align="left">
+        <p>Click the highlighted text to view its definition</p>
+        <p>点击重点词汇即可查看注释</p>
+      </el-form-item>
+      <el-form-item>
+        <DisplayText
+          :jsonResults="jsonResults"
+          :output="output"
+        />
+      </el-form-item>
       <br/>
-      <el-button type="primary" @click="reset()">New Text</el-button>
-    </div>
-    <br/>
-    <br/>
+      <el-form-item>
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <span>Words that you may not know:</span>
+          </div>
+          <div v-for="(wm, index) in wordMeaning" :key="`wm-${index}`" class="text item">
+            {{wm[0]}}&nbsp;{{wm[2]}}
+          </div>
+        </el-card>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -140,9 +138,9 @@
   }
 
   textarea {
-    width: 100%;
+    width: auto;
     height: 50%;
-    min-height: 200px !important;
+    min-height: 200px;
   }
 
   .vocab {
@@ -156,12 +154,13 @@
   }
 
   .item {
-    padding: 18px 0;
+    padding: 5px 0px;
+    margin: 1%;
   }
 
   .box-card {
-    width: 480px;
-    margin: auto !important;
+    position: absolute;
+    margin-bottom: 5%;
   }
 
   .el-form-item__error {
