@@ -37,7 +37,7 @@
     methods: {
       async handleChange(value) {
         try {
-              const response = await axios.get(`/app/samples`, {
+              const response = await axios.get(`http://127.0.0.1:5000/samples`, {
                 params: {genre: 'fiction', level: value[0]}
               })
               this.$emit('getData', {'text': response['data']['text'], 'level': value[0]});

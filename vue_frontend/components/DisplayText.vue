@@ -51,8 +51,8 @@
       this.string = "<div>".concat(this.originText, "</div>");
     }
     },
-    created() {
-      this.init();
+    mounted() {
+      this.init()
     }
   }
 </script>

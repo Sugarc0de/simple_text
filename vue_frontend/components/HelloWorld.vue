@@ -6,8 +6,7 @@
     <br/>
     <el-form ref="form" :model="form" :rules="rules">
       <el-form-item align="left">
-        <p>Copy and paste your own English text and the program will highlight difficult vocabulary based on your
-          English level </p>
+        <p>Copy and paste your own English text and the program will highlight the difficult vocabulary for you</p>
         <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
         <AutoImport @getData="getSample"/>
       </el-form-item>
@@ -25,37 +24,9 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('form')">Find Words</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
-  <div position="absolute" v-else>
-    <h1 class="title" style="color:white;">Simple Text</h1>
-    <br/>
-    <el-form>
-      <el-form-item align="left">
-        <el-button type="primary" @click="reset()">Back</el-button>
-      </el-form-item>
-      <el-form-item align="left">
-        <p>Click the highlighted text to view its definition</p>
-        <p>点击重点词汇即可查看注释</p>
-      </el-form-item>
-      <el-form-item>
-        <DisplayText
-          :jsonResults="jsonResults"
-          :output="output"
-        />
-      </el-form-item>
-      <br/>
-      <el-form-item>
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>Words that you may not know:</span>
-          </div>
-          <div v-for="(wm, index) in wordMeaning" :key="`wm-${index}`" class="text item">
-            {{wm[0]}}&nbsp;{{wm[2]}}
-          </div>
-        </el-card>
+        <el-button type="primary" @click="onSubmit('form')">
+            Find Words
+        </el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -63,11 +34,9 @@
 
 <script>
   import axios from 'axios';
-  import DisplayText from "./DisplayText";
   import AutoImport from "./AutoImport"
-
   export default {
-    components: {DisplayText, AutoImport},
+    components: {AutoImport},
     data() {
       return {
         form: {
@@ -92,27 +61,31 @@
       handleChange(val) {
       },
       reset() {
-        if (!this.hide_input) {
-          this.hide_input = true
-        }
         this.form.desc = ''
       },
+      // ...mapMutations({
+      //   save_json: 'save_json',
+      //   save_output: 'save_output'
+      // }),
       onSubmit(formName) {
-        console.log(formName);
+        // history.pushState(window.history.state, '', '/')
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
-              const response = await axios.post(`/app/findwords`, {
+              const response = await axios.post(`http://127.0.0.1:5000/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
               this.output = this.form.desc.replace(/\n/g, '<br>');
               //console.log(response['data'])
               this.jsonResults = response['data']
+              this.$store.commit('save_json', this.jsonResults)
+              this.$store.commit('save_output', this.output)
               this.wordMeaning = this.jsonResults['new_text']
               this.hide_input = false
             } catch (e) {
               this.errors.push(e)
             }
+            this.$router.push('/result')
           } else {
             return false
           }
@@ -121,7 +94,7 @@
       getSample(value) {
         this.form.desc = value['text'];
         this.form.value = `${value['level']}2`
-      }
+      },
     }
   }
 </script>
@@ -159,7 +132,6 @@
   }
 
   .box-card {
-    position: absolute;
     margin-bottom: 5%;
   }
 
