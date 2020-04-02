@@ -10,7 +10,7 @@
         <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
         <AutoImport @getData="getSample"/>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="desc">
         <el-input type="textarea" v-model="form.desc" placeholder="Copy-paste your own text(s)..."></el-input>
       </el-form-item>
       <el-form-item prop="value">
@@ -45,7 +45,10 @@
         },
         rules: {
           value: [
-            {required: true}
+            {message: 'Required', required: true},
+          ],
+          desc: [
+            {message: 'Required', required: true}
           ]
         },
         hide_input: true,
@@ -63,16 +66,12 @@
       reset() {
         this.form.desc = ''
       },
-      // ...mapMutations({
-      //   save_json: 'save_json',
-      //   save_output: 'save_output'
-      // }),
       onSubmit(formName) {
         // history.pushState(window.history.state, '', '/')
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
-              const response = await axios.post(`http://127.0.0.1:5000/findwords`, {
+              const response = await axios.post(`/app/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
               this.output = this.form.desc.replace(/\n/g, '<br>');
@@ -141,8 +140,8 @@
     line-height: 1;
     padding-top: 4px;
     position: absolute;
-    top: 20%;
-    left: 0;
+    top: -20%;
+    left: 80%;
   }
 
   .el-button--primary {

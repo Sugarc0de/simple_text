@@ -1,47 +1,49 @@
 <template>
   <div class="container">
-      <HelloWorld />
+    <HelloWorld/>
   </div>
 </template>
 
 <script>
-import HelloWorld from '~/components/HelloWorld.vue'
+  import HelloWorld from '~/components/HelloWorld.vue'
 
-export default {
-  components: {
-    HelloWorld,
+  export default {
+    components: {
+      HelloWorld,
+    },
   }
-}
 </script>
 
 <style>
-.container {
-  margin: 3%;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  position: relative;
-}
-body {
-  background-image: url(../static/background.jpeg) ;
-  background-position: center top;
-  background-repeat:  no-repeat;
-  background-attachment: fixed;
-  background-size:  cover;
-  background-margin: 0% 0%;
-  background-color: white;
-}
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
+  .container {
+    margin: 3%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
 
-.links {
-  padding-top: 15px;
-}
+  body {
+    background-image: url(../static/background.jpeg);
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-margin: 0% 0%;
+    background-color: white;
+  }
+
+  .subtitle {
+    font-weight: 300;
+    font-size: 42px;
+    color: #526488;
+    word-spacing: 5px;
+    padding-bottom: 15px;
+  }
+
+  .links {
+    padding-top: 15px;
+  }
 </style>

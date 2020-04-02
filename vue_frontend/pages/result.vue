@@ -60,7 +60,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   .container {
     margin: 3%;
     min-height: 100vh;
@@ -80,7 +80,7 @@
     background-margin: 0% 0%;
     background-color: white;
   }
-.title {
+  .title {
     font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     display: block;
