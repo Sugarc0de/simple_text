@@ -71,6 +71,7 @@
         this.$refs[formName].validate(async (valid) => {
           if (valid) {
             try {
+              this.form.desc = this.form.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
               const response = await axios.post(`/app/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
