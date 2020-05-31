@@ -100,7 +100,7 @@ def findwords():
         if text == '' or level not in CEFR:
             abort(400)
         ip = request.remote_addr
-        # aws_controller.put_item(ip, level, text)
+        aws_controller.put_text(ip, level, text)
         old_text, new_text = lemmatize(text)
         item_levels = findfreq(level, new_text)
         old_words = findOldtext(old_text, new_text, item_levels)
@@ -145,6 +145,9 @@ def upload_file():
             img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
             ocr = OCR(img, [0, 69, 150], [200, 255, 255])
             ocr_results = ocr.recognize()
+            predictions = "" if ocr_results == [] else ",".join([w[0] for w in ocr_results])
+            key = aws_controller.upload_to_s3(filestr, file.filename, bucket="ocr-image-dev", region="us-east-2")
+            aws_controller.put_image_key(key, predictions)
             return {'ocr_results': ocr_results}
     return '''
         <!doctype html>
