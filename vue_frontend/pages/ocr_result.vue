@@ -7,23 +7,16 @@
       <el-form-item align="left">
         <el-button type="primary" @click="reset()">Back</el-button>
       </el-form-item>
-      <el-form-item align="left">
-        <p>Click the highlighted text to view its definition</p>
-        <p>点击重点词汇即可查看注释</p>
-      </el-form-item>
       <el-form-item>
-        <DisplayText
-          :jsonResults="getJson"
-          :output="getOutput"
-        />
+        <img :src="src_data"  alt="Image preview..." width="600" />
       </el-form-item>
       <br/>
-        <el-card class="box-card" align="center">
+        <el-card class="box-card" align="center" :ocr_results="get_ocr_results">
           <div slot="header" class="clearfix">
             <span>Words that you may not know:</span>
           </div>
-          <div v-for="(wm, index) in wordMeaning" :key="`wm-${index}`" class="text item">
-            {{wm[0]}}&nbsp;{{wm[2]}}
+          <div v-for="(wm, index) in ocr_results" :key="`wm-${index}`" class="text item">
+            {{wm[0]}}&nbsp;{{wm[1]}}
           </div>
         </el-card>
     </el-form>
@@ -32,30 +25,29 @@
 </template>
 
 <script>
-  import DisplayText from "~/components/DisplayText";
-
   export default {
-    components: {DisplayText},
     name: "Result",
     data() {
       return {
-        wordMeaning: {},
-        jsonResults: {}
+        image_data: '',
+        ocr_results: {},
+        src_data: ''
       }
     },
     computed: {
-      getJson() {
-        this.wordMeaning = this.$store.state.jsonResults['new_text']
-        return this.$store.state.jsonResults
-      },
-      getOutput() {
-        return this.$store.state.output
+      get_ocr_results() {
+        this.ocr_results = this.$store.state.ocr_results
+        return this.$store.state.ocr_results
       }
     },
     methods: {
       reset() {
         this.$router.push('/')
       }
+    },
+    mounted() {
+      this.image_data = this.$store.state.file
+      this.src_data = URL.createObjectURL(this.image_data)
     }
   }
 </script>

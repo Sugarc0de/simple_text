@@ -1,9 +1,5 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, flash , redirect, url_for
 from flask_cors import CORS
-# from nltk.tokenize import sent_tokenize, word_tokenize
-# from nltk.stem import WordNetLemmatizer
-# import nltk
-# from nltk.corpus import wordnet
 import spacy
 from collections import defaultdict
 import read_stardict
@@ -16,9 +12,14 @@ import pandas as pd
 import json
 import os
 import string
+import cv2
+from model.ocr import OCR
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # spacy model for lemmatization (better)
 def lemmatize(text):
@@ -64,15 +65,20 @@ def findfreq(level, new_text):
     level_dict = []
     i = 0
     while i < len(item_levels):
-        chinese_text = dic.lookup(item_levels[i][0])
-        if chinese_text!='':
-            shorted = chinese_text.replace('\n', ' ')
-            if shorted == '':
-                level_dict.append((item_levels[i][0], item_levels[i][1], chinese_text))
-            else:
-                level_dict.append((item_levels[i][0], item_levels[i][1], shorted))
+        shorted, chinese_text = find_and_format_word(item_levels[i][0])
+        if shorted == '':
+            level_dict.append((item_levels[i][0], item_levels[i][1], chinese_text))
+        else:
+            level_dict.append((item_levels[i][0], item_levels[i][1], shorted))
         i += 1
     return level_dict
+
+def find_and_format_word(word):
+    chinese_text = dic.lookup(word)
+    if chinese_text != '':
+        shorted = chinese_text.replace('\n', ' ')
+        return shorted, chinese_text
+    return '', ''
 
 # find the old words corresponding to the most frequent lemmatized words
 def findOldtext(old_text, new_text, item_levels):
@@ -94,7 +100,7 @@ def findwords():
         if text == '' or level not in CEFR:
             abort(400)
         ip = request.remote_addr
-        aws_controller.put_item(ip, level, text)
+        # aws_controller.put_item(ip, level, text)
         old_text, new_text = lemmatize(text)
         item_levels = findfreq(level, new_text)
         old_words = findOldtext(old_text, new_text, item_levels)
@@ -112,6 +118,45 @@ def test():
             return {'text': obj['text']}
     abort(400)
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/ocr', methods=['POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            abort(400)
+        if file and allowed_file(file.filename):
+            # read image file string data
+            filestr = file.read()
+            # convert string data to numpy array
+            npimg = np.fromstring(filestr, np.uint8)
+            # convert numpy array to image
+            img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+            ocr = OCR(img, [0, 69, 150], [200, 255, 255])
+            ocr_results = ocr.recognize()
+            return {'ocr_results': ocr_results}
+    return '''
+        <!doctype html>
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form method=post enctype=multipart/form-data>
+          <input type=file name=file>
+          <input type=submit value=Upload>
+        </form>
+        '''
+
+
 @app.route('/')
 def hello():
     return "Hello World!"
@@ -127,3 +172,6 @@ if __name__ == '__main__':
     # app.debug = False
     # http_server = WSGIServer(('', 8000), app)
     # http_server.serve_forever()
+
+
+

@@ -1,4 +1,6 @@
 export default () => ({
   jsonResults: {},
-  output: ''
+  output: '',
+  file: '',
+  ocr_results: {}
 })

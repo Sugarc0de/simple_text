@@ -1,6 +1,6 @@
 <template>
   <div v-if="hide_input">
-    <h1 class="title" style="color:white;">Simple Text</h1>
+    <h1 class="title" style="color:white;font-size:68px">VocabAssist</h1>
     <br/>
     <br/>
     <br/>
@@ -8,7 +8,14 @@
       <el-form-item align="left">
         <p>Copy and paste your own English text and the program will highlight the difficult vocabulary for you</p>
         <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
-        <AutoImport @getData="getSample"/>
+        <el-form-item>
+          <el-col :span="11">
+            <AutoImport @getData="getSample"/>
+          </el-col>
+          <el-col :span="11" align="right">
+            <FileUpload />
+          </el-col>
+      </el-form-item>
       </el-form-item>
       <el-form-item prop="desc">
         <el-input type="textarea" v-model="form.desc" placeholder="Copy-paste your own text(s)..."></el-input>
@@ -35,8 +42,9 @@
 <script>
   import axios from 'axios';
   import AutoImport from "./AutoImport"
+  import FileUpload from "./FileUpload"
   export default {
-    components: {AutoImport},
+    components: {AutoImport, FileUpload},
     data() {
       return {
         form: {
@@ -72,7 +80,7 @@
           if (valid) {
             try {
               this.form.desc = this.form.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-              const response = await axios.post(`/app/findwords`, {
+              const response = await axios.post(`http://127.0.0.1:5000/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
               this.output = this.form.desc.replace(/\n/g, '<br>');

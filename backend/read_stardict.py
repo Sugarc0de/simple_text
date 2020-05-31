@@ -43,12 +43,13 @@ import json
 # dict_file.close()
 
 class Dictionary:
-    def __init__(self):
-        with open('stardict-lazyworm-ec-2.4.2/lazy_dict_idx.json') as f:
+    def __init__(self, dict_dir='stardict-lazyworm-ec-2.4.2/'):
+        self.dict_dir = dict_dir
+        with open(dict_dir+'lazy_dict_idx.json') as f:
             self.dict_idx = json.load(f)
 
     def lookup(self, word):
-        dict_file = open('stardict-lazyworm-ec-2.4.2/lazyworm-ec', 'rb')
+        dict_file = open(self.dict_dir + 'lazyworm-ec', 'rb')
         word_data_offset, word_data_size = self.dict_idx.get(word, (-1, -1))
         if word_data_offset == -1 and word_data_size == -1:
             return ""
@@ -56,7 +57,4 @@ class Dictionary:
         word_dict = dict_file.read(word_data_size)
         dict_file.close()
         return(word_dict.decode('utf-8'))
-
-
-
 
