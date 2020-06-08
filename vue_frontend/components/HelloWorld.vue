@@ -9,12 +9,7 @@
         <p>Copy and paste your own English text and the program will highlight the difficult vocabulary for you</p>
         <p>复制粘贴任意英文文章，即可一键生成所有生词</p>
         <el-form-item>
-          <el-col :span="11">
-            <AutoImport @getData="getSample"/>
-          </el-col>
-          <el-col :span="11" align="right">
-            <FileUpload />
-          </el-col>
+          <AutoImport @getData="getSample"/>
       </el-form-item>
       </el-form-item>
       <el-form-item prop="desc">
@@ -80,7 +75,7 @@
           if (valid) {
             try {
               this.form.desc = this.form.desc.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-              const response = await axios.post(`http://127.0.0.1:5000/findwords`, {
+              const response = await axios.post(`/app/findwords`, {
                 text: this.form.desc, level: this.form.value
               })
               this.output = this.form.desc.replace(/\n/g, '<br>');
