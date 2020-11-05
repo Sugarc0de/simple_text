@@ -34,7 +34,7 @@ class Wordlist:
             regex = re.compile(".* /.*/")
             for level in wordlists:
                 self.dic[level] = [[], [], []]
-                with open('{}_wordlist'.format(level), 'r') as f:
+                with open('wordlists/{}_wordlist'.format(level), 'r') as f:
                     for line in f:
                         result = regex.search(line)
                         if result is not None:
