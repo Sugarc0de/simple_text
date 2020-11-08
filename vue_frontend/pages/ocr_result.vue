@@ -8,7 +8,7 @@
         <el-button type="primary" @click="reset()">Back</el-button>
       </el-form-item>
       <el-form-item>
-        <img :src="src_data"  alt="Image preview..." width="600" />
+        <img :src="src_data"  alt="Image preview..." width="100%" />
       </el-form-item>
       <br/>
         <el-card class="box-card" align="center" :ocr_results="get_ocr_results">
@@ -46,7 +46,7 @@
       }
     },
     mounted() {
-      this.image_data = this.$store.state.file
+      this.image_data = this.$store.state.file;
       this.src_data = URL.createObjectURL(this.image_data)
     }
   }

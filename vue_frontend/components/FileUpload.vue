@@ -1,9 +1,8 @@
 <template>
   <div>
-    <el-button size="small" type="primary"><i class="el-icon-upload el-icon-right"></i>
-      <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
-      <!--<button v-on:click="submitFile()">Submit</button>-->
-    </el-button>
+    <el-upload action="" accept="image/jpeg,image/png" :data="fileList" :show-file-list="false" :httpRequest="submitFile" multiple :limit="1">
+      <el-button size="large" type="primary">荧光识词</el-button>
+    </el-upload>
   </div>
 </template>
 
@@ -15,7 +14,7 @@
     */
     data(){
       return {
-        file: '',
+        fileList: {},
         import_text: false
       }
     },
@@ -24,54 +23,46 @@
       /*
         Submits the file to the server
       */
-      async submitFile(){
+      submitFile(param) {
         /*
                 Initialize the form data
             */
-            let formData = new FormData();
+            var formData = new FormData();
 
             /*
                 Add the form data we need to submit
             */
-            formData.append('file', this.file);
+            formData.append('file', param.file);
 
         /*
           Make the request to the POST /ocr URL
         */
-            try {
-              const response = await axios.post('/app/ocr',
-                formData,
-                {
-                  headers: {
-                    'Content-Type': 'multipart/form-data'
-                  }
-                }
-              );
-              this.$store.commit('save_file', this.file);
-              this.$store.commit('save_ocr', response['data']['ocr_results']);
-
-            } catch(e) {
-              this.errors.push(e)
-            };
-            this.$router.push('/ocr_result')
-      },
-
-      /*
-        Handles a change on the file upload
-      */
-      handleFileUpload(){
-        this.file = this.$refs.file.files[0];
-        this.submitFile()
+            let self = this
+            axios({
+              method: 'post',
+              url: '/app/ocr',
+              data: formData,
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              }
+            }).then(function (response) {
+              console.log(`response is ${response['data']}`);
+              self.$store.commit('save_file', param.file);
+              self.$store.commit('save_ocr', response['data']['ocr_results']);
+            }).catch(function (error) {
+              console.log(error)
+            }).then(function () {
+               self.$router.push('/ocr_result')
+            });
       }
     }
   }
 </script>
 
-
 <style scoped>
-input[type=file]{
-  color:transparent;
-  width: 80px;
-  font-size: 10px;
+.el-button {
+  font-size: 18px;
+  border: 3px solid white;
+  background-color: Transparent;
 }
 </style>

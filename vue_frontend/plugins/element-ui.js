@@ -10,6 +10,8 @@ import Option from 'element-ui/lib/option'
 import PopOver from 'element-ui/lib/popover'
 import Cascader from 'element-ui/lib/cascader'
 import Col from 'element-ui/lib/col'
+import Row from 'element-ui/lib/row'
+import Upload from 'element-ui/lib/upload'
 
 // import locale from 'element-ui/lib/locale/lang/en'
 
@@ -23,4 +25,6 @@ Vue.use(Option)
 Vue.use(PopOver)
 Vue.use(Cascader)
 Vue.use(Col)
+Vue.use(Upload)
+Vue.use(Row)
 

@@ -16,23 +16,20 @@
 
 <style>
   .container {
-    margin: 3%;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    position: relative;
   }
 
   body {
-    background-image: url(../static/background.jpeg);
+    background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(../static/background.jpeg);
     background-position: center top;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
     background-margin: 0% 0%;
-    background-color: white;
   }
 
   .subtitle {

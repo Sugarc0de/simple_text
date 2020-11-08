@@ -1,7 +1,7 @@
 <template>
   <div>
   <div v-if="is_hide">
-  <h1 class="title" style="color:white;font-size:68px">VocabAssist</h1>
+  <h1 class="title" style="color:white;font-size:10vw;">VOCABASSIST</h1>
   <br/>
   <br/>
   <br/>
@@ -9,7 +9,7 @@
   <el-row>
       <el-col :span="12"><FileUpload />
     </el-col>
-    <el-col :span="12"><el-button @click="click_import_text">Import Text</el-button></el-col>
+    <el-col :span="12"><el-button @click="click_import_text">自动猜词</el-button></el-col>
     </el-row>
     </div>
   <div v-else>
@@ -45,9 +45,16 @@
     font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     display: block;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 100px;
-    color: #35495e;
+    color: white;
     letter-spacing: 1px;
   }
+
+.el-button {
+  font-size: 18px;
+  border: 3px solid #cf404d;
+  background-color: #cf404d;
+  color: white;
+}
 </style>

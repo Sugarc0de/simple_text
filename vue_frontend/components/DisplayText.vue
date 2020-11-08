@@ -60,6 +60,6 @@
 <style scoped>
   .result {
     padding: 5px;
-    border: 1px dashed purple;
+    background-color: wheat;
   }
 </style>

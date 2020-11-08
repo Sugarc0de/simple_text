@@ -136,6 +136,7 @@
 
   .box-card {
     margin-bottom: 5%;
+    background-color: wheat;
   }
 
   .el-form-item__error {
@@ -146,6 +147,10 @@
     position: absolute;
     top: -20%;
     left: 80%;
+  }
+
+  .el-form-item {
+    margin: 8px;
   }
 
   .el-button--primary {
@@ -174,5 +179,9 @@
     color: #fff;
     background-color: #b0c4de;
     border-color: #b0c4de;
+  }
+
+  p {
+    color: white;
   }
 </style>
