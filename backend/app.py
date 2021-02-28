@@ -16,10 +16,20 @@ import cv2
 from model.ocr import OCR
 from werkzeug.utils import secure_filename
 
+
 app = Flask(__name__)
 CORS(app, support_credentials=True)
+app.config.from_envvar('YOURAPPLICATION_SETTINGS')
 
+### INITIALIZE MODEL AND GLOBAL VARIABLES ###
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+dic = read_stardict.Dictionary()
+wl = process_wordlist.Wordlist()
+model = baseline_model.FreqModel()
+sp = spacy.load('en_core_web_sm')
+CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+#############################################
+
 
 # spacy model for lemmatization (better)
 def lemmatize(text):
@@ -164,17 +174,15 @@ def upload_file():
 def hello():
     return "Hello World!"
 
-if __name__ == '__main__':
-    dic = read_stardict.Dictionary()
-    wl = process_wordlist.Wordlist()
-    model = baseline_model.FreqModel()
-    sp = spacy.load('en_core_web_sm')
-    CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
-    app.run(debug=True)
-    # from gevent.pywsgi import WSGIServer
-    # app.debug = False
-    # http_server = WSGIServer(('', 8000), app)
-    # http_server.serve_forever()
 
+if __name__ == '__main__':
+    app.run()
+
+# if __name__ == '__main__':
+#     app.run()
+#     # from gevent.pywsgi import WSGIServer
+#     # app.debug = False
+#     # http_server = WSGIServer(('', 8000), app)
+#     # http_server.serve_forever()
 
 

@@ -9,4 +9,21 @@ This program aims to auto-highlight potentially difficult vocabulary from a piec
 
 ## Running it
 
-In backend folder, run `python app.py`
+First export your environment setting in terminal
+```
+export YOURAPPLICATION_SETTINGS=[dev|prod].settings.cfg
+```
+
+#### Local development:
+```
+cd backend && python3 app.py
+```
+
+#### EC2 instance:
+```
+cd backend && gunicorn --bind 127.0.0.1:5000 wsgi:app
+```
+
+### Notes:
+new way to install scipy language pipeline:
+`python -m spacy download en_core_web_sm`
