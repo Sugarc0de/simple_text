@@ -178,11 +178,4 @@ def hello():
 if __name__ == '__main__':
     app.run()
 
-# if __name__ == '__main__':
-#     app.run()
-#     # from gevent.pywsgi import WSGIServer
-#     # app.debug = False
-#     # http_server = WSGIServer(('', 8000), app)
-#     # http_server.serve_forever()
-
 

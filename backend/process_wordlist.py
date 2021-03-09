@@ -14,10 +14,10 @@ import numpy as np
 # english_profile_wordlist has total six levels from https://www.toe.gr/course/view.php?id=27
 
 class Wordlist:
-    def __init__(self, curr_dir=""):
+    def __init__(self, curr_dir="data"):
         dict_file = 'english_profile_wordlist.pickle'
-        self.loaded_model = pickle.load(open('baseline_model.sav', 'rb'))
-        if not os.path.exists(curr_dir+dict_file):
+        self.loaded_model = pickle.load(open('model/baseline_model.sav', 'rb'))
+        if not os.path.exists(os.path.join(curr_dir, dict_file)):
             self.S = set()
             self.dic = defaultdict()
             # CEFR = ['A1', 'A2', 'B1', 'B2']
@@ -34,7 +34,7 @@ class Wordlist:
             regex = re.compile(".* /.*/")
             for level in wordlists:
                 self.dic[level] = [[], [], []]
-                with open('wordlists/{}_wordlist'.format(level), 'r') as f:
+                with open('data/wordlists/{}_wordlist'.format(level), 'r') as f:
                     for line in f:
                         result = regex.search(line)
                         if result is not None:
@@ -45,11 +45,11 @@ class Wordlist:
                                 self.dic[level][2].append(parts[1])
                                 self.S.add(parts[0])
                 self.dic[level][1] = math.log(sum(self.dic[level][1])/len(self.dic[level][1]))
-            with open(curr_dir+dict_file, 'wb') as handle:
+            with open(os.path.join(curr_dir, dict_file), 'wb') as handle:
                 pickle.dump(self.dic, handle)
             print('Finished creating the dictionary.')
         else:
-            with open(curr_dir+dict_file, 'rb') as handle:
+            with open(os.path.join(curr_dir, dict_file), 'rb') as handle:
                 self.dic = pickle.load(handle)
             print('Finished loading the dictionary.')
         return

@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 import pickle
 import math
+import os
 from wordfreq import word_frequency
 
 class FreqModel:
-    def __init__(self, filename='baseline_model.sav'):
-        self.loaded_model = pickle.load(open(filename, 'rb'))
+    def __init__(self, filename='baseline_model.sav', model_dir='model'):
+        self.loaded_model = pickle.load(open(os.path.join(model_dir, filename), 'rb'))
         self.levelMap = {1: 'A1', 2: 'A2', 3:'B1',
                          4:'B2', 5:'C1', 6:'C2'}
 
